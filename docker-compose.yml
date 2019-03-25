@@ -1,0 +1,29 @@
+version: '3.0'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: bin/docker/Dockerfile
+    ports:
+      - "8040:80"
+    links:
+      - db
+    env_file:
+      - env
+    volumes:
+      - web:/var/www/html
+  db:
+    image: mysql:5.6.23
+    volumes:
+      - db-data:/var/lib/mysql/data
+    env_file:
+      - bin/env/env
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8540:80"
+    links:
+      - db     
+volumes:
+  db-data:   
