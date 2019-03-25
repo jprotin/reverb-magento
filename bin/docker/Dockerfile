@@ -8,13 +8,12 @@ ENV INSTALL_DIR /var/www/html
 
 RUN cd /tmp && \
     curl https://codeload.github.com/OpenMage/magento-mirror/tar.gz/$MAGENTO_VERSION -o $MAGENTO_VERSION.tar.gz && \
-    tar xvf $MAGENTO_VERSION.tar.gz && \
-    mv magento-mirror-$MAGENTO_VERSION/* magento-mirror-$MAGENTO_VERSION/.htaccess $INSTALL_DIR
+    tar xvf $MAGENTO_VERSION.tar.gz
 
 RUN chown -R www-data:www-data $INSTALL_DIR
 
 RUN apt-get update && \
-    apt-get install -y mysql-client-5.7 libxml2-dev libmcrypt4 libmcrypt-dev libpng-dev libjpeg-dev libfreetype6 libfreetype6-dev
+    apt-get install -y mysql-client-5.7 libxml2-dev libmcrypt4 libmcrypt-dev libpng-dev libjpeg-dev libfreetype6 libfreetype6-dev git
 RUN docker-php-ext-install soap
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install mcrypt
@@ -26,8 +25,10 @@ RUN chmod +x /usr/local/bin/install-magento
 
 COPY ./bin/sampledata/magento-sample-data-1.9.1.0.tgz /opt/
 COPY ./bin/install/install-sampledata-1.9 /usr/local/bin/install-sampledata
-COPY ./bin/entrypoint/entrypoint.sh /tmp/entrypoint.sh
 RUN chmod +x /usr/local/bin/install-sampledata
+
+COPY ./bin/entrypoint/entrypoint.sh /tmp/entrypoint.sh
+RUN chmod 777 -R /tmp
 
 RUN bash -c 'bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)'
 RUN mv ~/bin/modman /usr/local/bin
